@@ -10,6 +10,10 @@ export enum BloodType {
   ONegative = 'O-',
 }
 
+export function isBloodType(value: string): value is BloodType {
+  return Object.values(BloodType).includes(value as BloodType);
+}
+
 export interface BloodInventory {
   bloodType: BloodType;
   units: number;
@@ -18,6 +22,10 @@ export interface BloodInventory {
 export enum DonationType {
     Center = 'At a Donation Center',
     Pickup = 'Agent Pickup'
+}
+
+export function isDonationType(value: string): value is DonationType {
+    return Object.values(DonationType).includes(value as DonationType);
 }
 
 export interface DonationRequest {

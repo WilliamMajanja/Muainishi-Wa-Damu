@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { BloodInventory as BloodInventoryType } from '../types';
@@ -27,7 +28,8 @@ const BloodInventory: React.FC = () => {
             setError(null);
             try {
                 const data = await getBloodInventory();
-                const sortedData = data.sort((a, b) => a.bloodType.localeCompare(b.bloodType));
+                // Create a mutable copy before sorting to avoid read-only errors on mock data
+                const sortedData = [...data].sort((a, b) => a.bloodType.localeCompare(b.bloodType));
                 setInventory(sortedData);
             } catch (err) {
                 console.error("Failed to fetch blood inventory:", err);

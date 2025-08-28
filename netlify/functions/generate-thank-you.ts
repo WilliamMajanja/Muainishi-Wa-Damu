@@ -11,9 +11,11 @@ export const handler = async (event) => {
   }
 
   try {
-    const { donorName } = JSON.parse(event.body);
-    if (!donorName) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'donorName is required.' }) };
+    const body = JSON.parse(event.body);
+    const { donorName } = body;
+    
+    if (!donorName || typeof donorName !== 'string' || donorName.trim() === '') {
+      return { statusCode: 400, body: JSON.stringify({ error: 'donorName is required and must be a non-empty string.' }) };
     }
 
     const ai = new GoogleGenAI({ apiKey: API_KEY });

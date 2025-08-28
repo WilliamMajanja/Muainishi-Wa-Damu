@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { AgentTask, DonationRequest, BloodRequest } from '../types';
 import { getAgentTasks, getCompletedAgentTasks } from '../services/bloodBankService';
+import { getAgentSession, setAgentSession, clearAgentSession } from '../services/sessionService';
 import { MapPinIcon } from './icons/MapPinIcon';
 import { BloodDropIcon } from './icons/BloodDropIcon';
 import { CheckCircleIcon } from './icons/CheckCircleIcon';
+import AgentLogin from './AgentLogin';
 
 const TaskCard: React.FC<{ task: AgentTask }> = ({ task }) => {
     const isPickup = task.type === 'Pickup';
@@ -44,6 +46,11 @@ const TaskCard: React.FC<{ task: AgentTask }> = ({ task }) => {
 
 
 const AgentDashboard: React.FC = () => {
+    // State is initialized from session storage for persistence
+    const [agentName, setAgentName] = useState<string | null>(() => getAgentSession());
+    // isAuthenticated is now a derived state, no need for its own useState
+    const isAuthenticated = !!agentName;
+
     const [tasks, setTasks] = useState<AgentTask[]>([]);
     const [completedTasks, setCompletedTasks] = useState<AgentTask[]>([]);
     const [loading, setLoading] = useState(true);
@@ -51,6 +58,9 @@ const AgentDashboard: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        // Only fetch tasks if authenticated
+        if (!isAuthenticated) return;
+
         const fetchAllTasks = async () => {
             setLoading(true);
             setLoadingHistory(true);
@@ -62,8 +72,8 @@ const AgentDashboard: React.FC = () => {
                 ]);
                 setTasks(activeData);
                 setCompletedTasks(completedData);
-            } catch (error) {
-                console.error("Failed to fetch tasks:", error);
+            } catch (err) {
+                console.error("Failed to fetch tasks:", err);
                 setError("Could not load agent tasks. Please try again later.");
             } finally {
                 setLoading(false);
@@ -71,13 +81,47 @@ const AgentDashboard: React.FC = () => {
             }
         };
         fetchAllTasks();
-    }, []);
+    }, [isAuthenticated]); // Re-run effect when authentication state changes
+    
+    const handleLoginSuccess = (name: string) => {
+        setAgentSession(name); // Persist session
+        setAgentName(name);
+    };
+
+    const handleLogout = () => {
+        clearAgentSession(); // Clear session
+        setAgentName(null);
+        // Clear task data to prevent flashing on next login
+        setTasks([]);
+        setCompletedTasks([]);
+    };
+
+    if (!isAuthenticated) {
+        return (
+            <div className="bg-gray-100 min-h-screen py-12">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <AgentLogin onLoginSuccess={handleLoginSuccess} />
+                </div>
+            </div>
+        );
+    }
 
   return (
     <div className="bg-gray-100 min-h-screen py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Agent Dashboard</h2>
-            <p className="text-gray-500 mb-8">Welcome back, Agent 007. Here are your tasks for today.</p>
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h2 className="text-3xl font-bold text-gray-800 mb-2">Agent Dashboard</h2>
+                    <p className="text-gray-500">Welcome back, {agentName}. Here are your tasks for today.</p>
+                </div>
+                <button
+                    onClick={handleLogout}
+                    className="bg-brand-red text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    aria-label="Log out"
+                >
+                    Log Out
+                </button>
+            </div>
 
             {loading ? (
                 <p>Loading tasks...</p>

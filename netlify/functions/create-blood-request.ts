@@ -1,3 +1,5 @@
+import { isValidBloodRequestPayload } from './utils/validators';
+
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -5,7 +7,15 @@ export const handler = async (event) => {
 
   try {
     const data = JSON.parse(event.body);
-    console.log('Received blood request:', data);
+    
+    if (!isValidBloodRequestPayload(data)) {
+        return {
+            statusCode: 400, // Bad Request
+            body: JSON.stringify({ error: 'Invalid blood request payload. Please check your data.' }),
+        };
+    }
+
+    console.log('Received valid blood request:', data);
     
     // In a real application, you would now:
     // 1. Validate the data.

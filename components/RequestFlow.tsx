@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BloodType } from '../types';
+import { BloodType, isBloodType } from '../types';
 import { submitBloodRequest } from '../services/bloodBankService';
 
 interface RequestFlowProps {
@@ -65,13 +65,18 @@ const RequestFlow: React.FC<RequestFlowProps> = ({ goHome }) => {
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="bloodType" className="block text-sm font-medium text-gray-700">Blood Type Needed</label>
-                    <select id="bloodType" value={formData.bloodType} onChange={(e) => setFormData({...formData, bloodType: e.target.value as BloodType})} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required>
+                    <select id="bloodType" value={formData.bloodType} onChange={(e) => {
+                        const value = e.target.value;
+                        if (isBloodType(value)) {
+                            setFormData({ ...formData, bloodType: value });
+                        }
+                    }} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required>
                       {Object.values(BloodType).map(bt => <option key={bt} value={bt}>{bt}</option>)}
                     </select>
                   </div>
                    <div>
                     <label htmlFor="units" className="block text-sm font-medium text-gray-700">Number of Units</label>
-                    <input type="number" id="units" min="1" max="10" value={formData.units} onChange={(e) => setFormData({...formData, units: parseInt(e.target.value, 10)})} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" required />
+                    <input type="number" id="units" min="1" max="10" value={formData.units} onChange={(e) => setFormData({...formData, units: parseInt(e.target.value, 10)})} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required />
                   </div>
                 </div>
                 <div className="mt-8 text-right">
@@ -86,11 +91,11 @@ const RequestFlow: React.FC<RequestFlowProps> = ({ goHome }) => {
                  <div className="space-y-4">
                    <div>
                     <label htmlFor="hospitalName" className="block text-sm font-medium text-gray-700">Hospital/Clinic Name & Address</label>
-                    <input type="text" id="hospitalName" value={formData.hospitalName} onChange={(e) => setFormData({...formData, hospitalName: e.target.value})} placeholder="e.g., Kenya National Hospital, Nairobi" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" required />
+                    <input type="text" id="hospitalName" value={formData.hospitalName} onChange={(e) => setFormData({...formData, hospitalName: e.target.value})} placeholder="e.g., Kenya National Hospital, Nairobi" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required />
                   </div>
                   <div>
                     <label htmlFor="reason" className="block text-sm font-medium text-gray-700">Reason for Request</label>
-                    <textarea id="reason" value={formData.reason} onChange={(e) => setFormData({...formData, reason: e.target.value})} rows={3} placeholder="e.g., Emergency surgery, patient with anemia" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" required />
+                    <textarea id="reason" value={formData.reason} onChange={(e) => setFormData({...formData, reason: e.target.value})} rows={3} placeholder="e.g., Emergency surgery, patient with anemia" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required />
                   </div>
                 </div>
                  {error && <p className="text-sm text-red-500 mt-4 text-center">{error}</p>}

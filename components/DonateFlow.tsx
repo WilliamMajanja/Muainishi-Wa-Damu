@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BloodType, DonationType } from '../types';
+import { BloodType, DonationType, isBloodType, isDonationType } from '../types';
 import ThankYouGenerator from './ThankYouGenerator';
 import { submitDonationRequest } from '../services/bloodBankService';
 
@@ -56,11 +56,16 @@ const DonateFlow: React.FC<DonateFlowProps> = ({ goHome }) => {
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
-                    <input type="text" id="name" value={formData.donorName} onChange={(e) => setFormData({...formData, donorName: e.target.value})} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" required />
+                    <input type="text" id="name" value={formData.donorName} onChange={(e) => setFormData({...formData, donorName: e.target.value})} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required />
                   </div>
                   <div>
                     <label htmlFor="bloodType" className="block text-sm font-medium text-gray-700">Blood Type</label>
-                    <select id="bloodType" value={formData.bloodType} onChange={(e) => setFormData({...formData, bloodType: e.target.value as BloodType})} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required>
+                    <select id="bloodType" value={formData.bloodType} onChange={(e) => {
+                        const value = e.target.value;
+                        if (isBloodType(value)) {
+                            setFormData({ ...formData, bloodType: value });
+                        }
+                    }} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required>
                       {Object.values(BloodType).map(bt => <option key={bt} value={bt}>{bt}</option>)}
                     </select>
                   </div>
@@ -77,7 +82,12 @@ const DonateFlow: React.FC<DonateFlowProps> = ({ goHome }) => {
                  <div className="space-y-4">
                   <div>
                     <label htmlFor="donationType" className="block text-sm font-medium text-gray-700">How would you like to donate?</label>
-                    <select id="donationType" value={formData.donationType} onChange={(e) => setFormData({...formData, donationType: e.target.value as DonationType})} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required>
+                    <select id="donationType" value={formData.donationType} onChange={(e) => {
+                        const value = e.target.value;
+                        if (isDonationType(value)) {
+                            setFormData({ ...formData, donationType: value });
+                        }
+                    }} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required>
                       {Object.values(DonationType).map(dt => <option key={dt} value={dt}>{dt}</option>)}
                     </select>
                   </div>
@@ -85,7 +95,7 @@ const DonateFlow: React.FC<DonateFlowProps> = ({ goHome }) => {
                     <label htmlFor="location" className="block text-sm font-medium text-gray-700">
                         {formData.donationType === DonationType.Center ? 'Preferred Donation Center' : 'Pickup Address'}
                     </label>
-                    <input type="text" id="location" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} placeholder={formData.donationType === DonationType.Center ? 'e.g., Nairobi Central KNBTS' : 'e.g., 123 Biashara St, Nairobi'} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red" required />
+                    <input type="text" id="location" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} placeholder={formData.donationType === DonationType.Center ? 'e.g., Nairobi Central KNBTS' : 'e.g., 123 Biashara St, Nairobi'} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red bg-white text-gray-900" required />
                   </div>
                 </div>
                 {error && <p className="text-sm text-red-500 mt-4 text-center">{error}</p>}
