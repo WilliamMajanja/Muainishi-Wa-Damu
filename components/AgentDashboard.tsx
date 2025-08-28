@@ -8,7 +8,7 @@ import { BloodDropIcon } from './icons/BloodDropIcon';
 import { CheckCircleIcon } from './icons/CheckCircleIcon';
 import AgentLogin from './AgentLogin';
 
-const TaskCard: React.FC<{ task: AgentTask }> = ({ task }) => {
+const TaskCard: React.FC<{ task: AgentTask; onUpdateStatus: (taskId: string, newStatus: 'Accepted' | 'In Progress') => void; }> = ({ task, onUpdateStatus }) => {
     const isPickup = task.type === 'Pickup';
     const details = task.details as DonationRequest | BloodRequest;
 
@@ -37,8 +37,8 @@ const TaskCard: React.FC<{ task: AgentTask }> = ({ task }) => {
             </div>
             <div className="bg-gray-50 p-3 flex justify-end space-x-2">
                 <button className="text-xs font-bold text-gray-600 hover:text-black transition-colors">Details</button>
-                {task.status === 'New' && <button className="text-xs font-bold bg-brand-green text-white px-3 py-1 rounded-md hover:bg-green-700 transition-colors">Accept</button>}
-                {task.status === 'Accepted' && <button className="text-xs font-bold bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition-colors">In Progress</button>}
+                {task.status === 'New' && <button onClick={() => onUpdateStatus(task.id, 'Accepted')} className="text-xs font-bold bg-brand-green text-white px-3 py-1 rounded-md hover:bg-green-700 transition-colors">Accept</button>}
+                {task.status === 'Accepted' && <button onClick={() => onUpdateStatus(task.id, 'In Progress')} className="text-xs font-bold bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition-colors">In Progress</button>}
             </div>
         </div>
     );
@@ -96,6 +96,14 @@ const AgentDashboard: React.FC = () => {
         setCompletedTasks([]);
     };
 
+    const handleUpdateTaskStatus = (taskId: string, newStatus: 'Accepted' | 'In Progress') => {
+        setTasks(prevTasks =>
+            prevTasks.map(task =>
+                task.id === taskId ? { ...task, status: newStatus } : task
+            )
+        );
+    };
+
     if (!isAuthenticated) {
         return (
             <div className="bg-gray-100 min-h-screen py-12">
@@ -132,7 +140,7 @@ const AgentDashboard: React.FC = () => {
             ) : tasks.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {tasks.map(task => (
-                        <TaskCard key={task.id} task={task} />
+                        <TaskCard key={task.id} task={task} onUpdateStatus={handleUpdateTaskStatus} />
                     ))}
                 </div>
             ) : (
