@@ -4,6 +4,10 @@ import { SparklesIcon } from './icons/SparklesIcon';
 import { InfoIcon } from './icons/InfoIcon';
 import { TrendingUpIcon } from './icons/TrendingUpIcon';
 import { BloodDropIcon } from './icons/BloodDropIcon';
+import BloodAnalyzer from './BloodAnalyzer';
+import PlateletAnalyzer from './PlateletAnalyzer';
+import WhiteCellAnalyzer from './WhiteCellAnalyzer';
+import FileUploadAnalyzer from './FileUploadAnalyzer';
 
 // Data based on general global statistics for a representative infographic
 // Updated colors to better reflect rarity (darker red = rarer)
@@ -46,6 +50,21 @@ const HaematologyInsights: React.FC = () => {
             <h2 className="text-3xl font-bold text-brand-black">Haematology Insights</h2>
             <p className="text-gray-600 mt-2">Understanding the value and rarity of every drop.</p>
         </div>
+
+        {/* AI-Powered File Upload Analyzer */}
+        <div className="mb-12">
+            <FileUploadAnalyzer />
+        </div>
+
+        {/* Simulated Analysis Tools Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <div className="lg:col-span-2">
+                <BloodAnalyzer />
+            </div>
+            <PlateletAnalyzer />
+            <WhiteCellAnalyzer />
+        </div>
+
 
         {/* Blood Rarity Infographic */}
         <div className="bg-white p-6 rounded-lg shadow-lg mb-12">

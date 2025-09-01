@@ -20,7 +20,9 @@ const BASE_MOCK_DONATION: DonationRequest = {
     donorName: 'Jane Doe',
     bloodType: BloodType.APositive,
     donationType: DonationType.Pickup,
-    location: '123 Biashara St, Nairobi',
+    location: '123 Biashara St, Nairobi CBD',
+    lat: -1.2833, 
+    lng: 36.8167,
     status: 'Scheduled',
     donationDate: new Date()
 }
@@ -31,6 +33,8 @@ const BASE_MOCK_REQUEST: BloodRequest = {
     bloodType: BloodType.ONegative,
     units: 2,
     reason: 'Emergency Surgery',
+    lat: -1.2921, 
+    lng: 36.8055,
     status: 'Approved'
 }
 
@@ -38,7 +42,7 @@ const BASE_MOCK_REQUEST: BloodRequest = {
 const MOCK_TASKS: AgentTask[] = [
     { id: 'TASK001', type: 'Pickup', details: BASE_MOCK_DONATION, status: 'New' },
     { id: 'TASK002', type: 'Delivery', details: BASE_MOCK_REQUEST, status: 'New' },
-    { id: 'TASK003', type: 'Pickup', details: { ...BASE_MOCK_DONATION, id: 'DONATE124', donorName: 'John Smith', bloodType: BloodType.BPositive, location: 'Westlands Office Park'}, status: 'Accepted' },
+    { id: 'TASK003', type: 'Pickup', details: { ...BASE_MOCK_DONATION, id: 'DONATE124', donorName: 'John Smith', bloodType: BloodType.BPositive, location: 'Westlands Office Park', lat: -1.2649, lng: 36.8041}, status: 'Accepted' },
 ];
 
 // from get-completed-agent-tasks.ts
@@ -46,21 +50,21 @@ const MOCK_COMPLETED_TASKS: AgentTask[] = [
     {
         id: 'TASKC01',
         type: 'Delivery',
-        details: { ...BASE_MOCK_REQUEST, id: 'REQ789', hospitalName: 'Aga Khan Hospital', units: 3, bloodType: BloodType.APositive },
+        details: { ...BASE_MOCK_REQUEST, id: 'REQ789', hospitalName: 'Aga Khan Hospital', units: 3, bloodType: BloodType.APositive, lat: -1.2706, lng: 36.8223 },
         status: 'Completed',
         completedDate: new Date('2024-05-20T10:00:00Z')
     },
     {
         id: 'TASKC02',
         type: 'Pickup',
-        details: { ...BASE_MOCK_DONATION, id: 'DONATE456', donorName: 'Peter Kamau', bloodType: BloodType.OPositive, location: 'Gigiri' },
+        details: { ...BASE_MOCK_DONATION, id: 'DONATE456', donorName: 'Peter Kamau', bloodType: BloodType.OPositive, location: 'Gigiri', lat: -1.2336, lng: 36.8066 },
         status: 'Completed',
         completedDate: new Date('2024-05-19T14:30:00Z')
     },
      {
         id: 'TASKC03',
         type: 'Delivery',
-        details: { ...BASE_MOCK_REQUEST, id: 'REQ101', hospitalName: 'Kenyatta National Hospital', units: 1, bloodType: BloodType.ABNegative },
+        details: { ...BASE_MOCK_REQUEST, id: 'REQ101', hospitalName: 'Kenyatta National Hospital', units: 1, bloodType: BloodType.ABNegative, lat: -1.3010, lng: 36.8078 },
         status: 'Completed',
         completedDate: new Date('2024-05-18T09:15:00Z')
     }

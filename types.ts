@@ -34,6 +34,8 @@ export interface DonationRequest {
     bloodType: BloodType;
     donationType: DonationType;
     location: string;
+    lat?: number;
+    lng?: number;
     status: 'Pending' | 'Scheduled' | 'Completed' | 'Cancelled';
     agentId?: string;
     donationDate: Date;
@@ -45,6 +47,8 @@ export interface BloodRequest {
     bloodType: BloodType;
     units: number;
     reason: string;
+    lat?: number;
+    lng?: number;
     status: 'Pending' | 'Approved' | 'In Transit' | 'Fulfilled';
     agentId?: string;
 }

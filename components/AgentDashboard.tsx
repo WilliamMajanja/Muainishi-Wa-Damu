@@ -7,8 +7,9 @@ import { MapPinIcon } from './icons/MapPinIcon';
 import { BloodDropIcon } from './icons/BloodDropIcon';
 import { CheckCircleIcon } from './icons/CheckCircleIcon';
 import AgentLogin from './AgentLogin';
+import TaskMap from './TaskMap';
 
-const TaskCard: React.FC<{ task: AgentTask; onUpdateStatus: (taskId: string, newStatus: 'Accepted' | 'In Progress') => void; }> = ({ task, onUpdateStatus }) => {
+const TaskCard: React.FC<{ task: AgentTask; onUpdateStatus: (taskId: string, newStatus: 'Accepted' | 'In Progress') => void; onCompleteTask: (taskId: string) => void; }> = ({ task, onUpdateStatus, onCompleteTask }) => {
     const isPickup = task.type === 'Pickup';
     const details = task.details as DonationRequest | BloodRequest;
 
@@ -39,6 +40,7 @@ const TaskCard: React.FC<{ task: AgentTask; onUpdateStatus: (taskId: string, new
                 <button className="text-xs font-bold text-gray-600 hover:text-black transition-colors">Details</button>
                 {task.status === 'New' && <button onClick={() => onUpdateStatus(task.id, 'Accepted')} className="text-xs font-bold bg-brand-green text-white px-3 py-1 rounded-md hover:bg-green-700 transition-colors">Accept</button>}
                 {task.status === 'Accepted' && <button onClick={() => onUpdateStatus(task.id, 'In Progress')} className="text-xs font-bold bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition-colors">In Progress</button>}
+                {task.status === 'In Progress' && <button onClick={() => onCompleteTask(task.id)} className="text-xs font-bold bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors">Mark as Complete</button>}
             </div>
         </div>
     );
@@ -46,9 +48,7 @@ const TaskCard: React.FC<{ task: AgentTask; onUpdateStatus: (taskId: string, new
 
 
 const AgentDashboard: React.FC = () => {
-    // State is initialized from session storage for persistence
     const [agentName, setAgentName] = useState<string | null>(() => getAgentSession());
-    // isAuthenticated is now a derived state, no need for its own useState
     const isAuthenticated = !!agentName;
 
     const [tasks, setTasks] = useState<AgentTask[]>([]);
@@ -58,7 +58,6 @@ const AgentDashboard: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Only fetch tasks if authenticated
         if (!isAuthenticated) return;
 
         const fetchAllTasks = async () => {
@@ -81,17 +80,16 @@ const AgentDashboard: React.FC = () => {
             }
         };
         fetchAllTasks();
-    }, [isAuthenticated]); // Re-run effect when authentication state changes
+    }, [isAuthenticated]);
     
     const handleLoginSuccess = (name: string) => {
-        setAgentSession(name); // Persist session
+        setAgentSession(name);
         setAgentName(name);
     };
 
     const handleLogout = () => {
-        clearAgentSession(); // Clear session
+        clearAgentSession();
         setAgentName(null);
-        // Clear task data to prevent flashing on next login
         setTasks([]);
         setCompletedTasks([]);
     };
@@ -102,6 +100,19 @@ const AgentDashboard: React.FC = () => {
                 task.id === taskId ? { ...task, status: newStatus } : task
             )
         );
+    };
+    
+    const handleCompleteTask = (taskId: string) => {
+        const taskToComplete = tasks.find(task => task.id === taskId);
+        if (taskToComplete) {
+            const updatedTask = {
+                ...taskToComplete,
+                status: 'Completed' as const,
+                completedDate: new Date(),
+            };
+            setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+            setCompletedTasks(prevCompleted => [updatedTask, ...prevCompleted]);
+        }
     };
 
     if (!isAuthenticated) {
@@ -131,24 +142,32 @@ const AgentDashboard: React.FC = () => {
                 </button>
             </div>
 
-            {loading ? (
-                <p>Loading tasks...</p>
-            ) : error ? (
-                <div className="text-center py-16 bg-white rounded-lg shadow-md mb-12 text-red-500">
-                    <h3 className="text-xl font-semibold">{error}</h3>
-                </div>
-            ) : tasks.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {tasks.map(task => (
-                        <TaskCard key={task.id} task={task} onUpdateStatus={handleUpdateTaskStatus} />
-                    ))}
-                </div>
-            ) : (
-                <div className="text-center py-16 bg-white rounded-lg shadow-md mb-12">
-                    <h3 className="text-xl font-semibold text-gray-700">No active tasks available.</h3>
-                    <p className="text-gray-500 mt-2">Check back later for new assignments.</p>
-                </div>
-            )}
+            <div className="mb-12">
+                 <h3 className="text-2xl font-bold text-gray-800 mb-4">Live Task Overview</h3>
+                {loading ? (
+                    <p>Loading tasks...</p>
+                ) : error ? (
+                    <div className="text-center py-16 bg-white rounded-lg shadow-md text-red-500">
+                        <h3 className="text-xl font-semibold">{error}</h3>
+                    </div>
+                ) : tasks.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div className="lg:col-span-3 bg-white rounded-lg shadow-lg overflow-hidden h-96 lg:h-auto">
+                           <TaskMap tasks={tasks} />
+                        </div>
+                        <div className="lg:col-span-2 space-y-6">
+                            {tasks.map(task => (
+                                <TaskCard key={task.id} task={task} onUpdateStatus={handleUpdateTaskStatus} onCompleteTask={handleCompleteTask} />
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-center py-16 bg-white rounded-lg shadow-md">
+                        <h3 className="text-xl font-semibold text-gray-700">No active tasks available.</h3>
+                        <p className="text-gray-500 mt-2">Check back later for new assignments.</p>
+                    </div>
+                )}
+            </div>
 
             {/* Completed Tasks History Section */}
             <div className="mt-16">

@@ -12,7 +12,10 @@
     "react-dom": "^19.1.1",
     "@google/genai": "^1.15.0",
     "react": "^19.1.1",
-    "recharts": "^3.1.2"
+    "recharts": "^3.1.2",
+    "leaflet": "^1.9.4",
+    "react-leaflet": "^4.2.1",
+    "react-dropzone": "^14.3.8"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
